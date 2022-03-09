@@ -1,1 +1,8 @@
 venv
+*.exe
+oauth.json
+lingo.json
+token.json
+*.txt
+node_modules
+yarn.lock
