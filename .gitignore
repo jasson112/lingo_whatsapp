@@ -6,3 +6,7 @@ token.json
 *.txt
 node_modules
 yarn.lock
+package-lock.json
+*.jpeg
+*.png
+*.jpg

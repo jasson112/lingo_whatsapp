@@ -1,6 +1,6 @@
 const qrcode = require('qrcode-terminal');
 
-const { Client } = require('whatsapp-web.js');
+const { Client, MessageMedia } = require('whatsapp-web.js');
 
 const fs = require('fs');
 const readline = require('readline');
@@ -70,12 +70,6 @@ async function getNewToken(oAuth2Client, callback) {
   });
 }
 
-/**
- * Prints the names and majors of students in a sample spreadsheet:
- * @see https://docs.google.com/spreadsheets/d/1BxiMVs0XRA5nFMdKvBdBZjgmUUqptlbs74OgvE2upms/edit
- * @param {google.auth.OAuth2} auth The authenticated Google OAuth client.
- * https://docs.google.com/spreadsheets/d/1TceIKuv_R7cJBU7fO4k3vAn9bAiPAXIzir7Wc-ltLJI/edit?usp=sharing
- */
 async function listMajors(auth) {
 
   const client = new Client();
@@ -91,40 +85,52 @@ async function listMajors(auth) {
 
   client.on('message', async msg => {
     if (msg.body == '!ping') {
-      console.log('SENDING MESSAGESSSSS')
+      console.log('SENDING MESSAGESSSSS***********************************************************************************************************************')
       const sheets = google.sheets({ version: 'v4', auth });
       sheets.spreadsheets.values.get({
         spreadsheetId: '1TceIKuv_R7cJBU7fO4k3vAn9bAiPAXIzir7Wc-ltLJI',
-        range: 'A:B',
+        range: 'A:C',
       }, (err, res) => {
         if (err) return console.log('The API returned an error: ' + err);
         const rows = res.data.values;
         if (rows.length) {
-          // Print columns A and E, which correspond to indices 0 and 4.
+          // Print columns A to C, which correspond to indices 0 and 2.
           rows.map(async (row) => {
             const number = row[0];
             if (number.toString() !== '0') {
               const sanitized_number = number.toString().replace(/[- )(]/g, ""); // remove unnecessary chars from the number
-              const final_number = `57${sanitized_number.substring(sanitized_number.length - 10)}`; // add 91 before the number here 91 is country code of India
+              const final_number = `57${sanitized_number.substring(sanitized_number.length - 10)}`; // add 57 before the number here 57 is country code
               try {
                 const number_details = await client.getNumberId(final_number); // get mobile number details
-                //console.log(number_details)
                 if (number_details) {
-                  const sendMessageData = await client.sendMessage(number_details._serialized, "*HOLA " + row[1] + "✨*\
-                  \n\nSabemos que estás comprometido(a) con tu proceso de aprendizaje de Inglés con LingoChamp y por eso queremos que aproveches el tiempo que te queda con todos los contenidos del Currículo Básico⏰\
-                  \nAl finalizar cada nivel, la app te genera un CERTIFICADO con su equivalencia con el Marco Común Europeo!🧾\
-                  \nAquí te dejamos el paso a paso para que lo descargues antes de que se te acabe el tiempo: https://docs.google.com/viewerng/viewer?url=https://lingoayuda.com/wp-content/uploads/2022/03/COMO-DESCARGAR-MIS-CERTIFICADOS-V-5.0.1.pdf \
-                  \n\n¡Recuerda que si completas 2 niveles te activaremos el Curso de Negocios por 3 meses! ¡Sigue avanzando con LingoChamp!🤳🏾"); // send message
-                  console.log(number, "Sended");
+                  // Create the message that it will be send
+                  const msg = `${row[1]} 🔊 *¿Quieres aprender más sobre LingoChamp y, además, tener la oportunidad de ganarte un bono Éxito?* 🔊
+Queremos invitarte *hoy a las 5:00 pm* a una sesión de concurso en vivo por nuestro Canal de YouTube *LingoChamp Colombia* 🤩
+👉🏻 Aquí te dejamos el enlace: https://www.youtube.com/channel/UC6fCvJdR2EkMB9C6y38_iIw
+*¡Te esperamos!*`
+
+                  // send message with image
+
+                  // const media = MessageMedia.fromFilePath('./active.jpeg');
+                  // const sendMessageData = await client.sendMessage(number_details._serialized, media, {caption: msg});
+
+
+                  // send message
+
+                  const sendMessageData = await client.sendMessage(number_details._serialized, msg); // send message
+
+                  console.log(`${row[1]},${row[0]},send`);
                 } else {
-                  console.log(number, "Mobile number is not registered");
+                  console.log(`${row[1]},${row[0]},not_register`);
                 }
               } catch (error) {
-                console.log("ERROR WTIH NUMBER", number)
+                console.log(error)
+                console.log(`${row[1]},${row[0]},error`);
               }
+            }else{
+              console.log(`${row[1]},${row[0]},no_number`);
             }
           });
-          console.log('FINISH HIM !!!')
         } else {
           console.log('No data found.');
         }
