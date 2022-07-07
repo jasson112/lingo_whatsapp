@@ -107,16 +107,15 @@ async function listMajors(auth) {
               messaging_product: "whatsapp",
               //TODO: REPLACE WITH VAR final_number
               to: "573006624294",
-              type: "text",
-              text: {
-                body: msg,
-              },
-              /*template: {
+              //Whatsapp cloud only supports template 
+              type: "template",
+              //https://developers.facebook.com/docs/whatsapp/api/messages/message-templates#supported-languages
+              template: {
                 name: "hello_world",
                 language: {
                   code: "en_US",
                 },
-              },*/
+              },
             });
 
             var config = {
