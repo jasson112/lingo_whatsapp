@@ -10,3 +10,4 @@ package-lock.json
 *.jpeg
 *.png
 *.jpg
+.env
